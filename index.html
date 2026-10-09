@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingeshMart - Multi-Seller E-Commerce Marketplace</title>
+    <!-- Bootstrap 5 & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lm-black: #090d16;
+            --lm-dark-blue: #0f172a;
+            --lm-navy: #1e293b;
+            --lm-accent-blue: #2563eb;
+            --lm-royal-blue: #1d4ed8;
+            --lm-light-bg: #f8fafc;
+        }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--lm-light-bg); 
+            color: #0f172a; 
+        }
+        .navbar-custom { 
+            background: linear-gradient(90deg, var(--lm-black) 0%, var(--lm-dark-blue) 100%); 
+            border-bottom: 1px solid #1e293b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25); 
+        }
+        .navbar-brand-title { 
+            font-weight: 800; 
+            color: #ffffff !important; 
+            font-size: 1.45rem; 
+            letter-spacing: -0.5px;
+        }
+        .navbar-brand-sub { 
+            font-size: 0.72rem; 
+            color: #60a5fa; 
+            font-weight: 600; 
+            letter-spacing: 0.5px;
+            margin-top: -4px; 
+        }
+        .btn-brand-primary { 
+            background-color: var(--lm-accent-blue); 
+            color: #fff; 
+            font-weight: 700; 
+            border-radius: 6px; 
+            border: none; 
+            transition: all 0.2s ease;
+        }
+        .btn-brand-primary:hover { 
+            background-color: var(--lm-royal-blue); 
+            color: #fff; 
+        }
+        .btn-brand-dark { 
+            background-color: var(--lm-dark-blue); 
+            color: #fff; 
+            font-weight: 700; 
+            border-radius: 6px; 
+            border: 1px solid #334155; 
+            transition: all 0.2s ease;
+        }
+        .btn-brand-dark:hover { 
+            background-color: #000000; 
+            color: #fff; 
+        }
+        .card-product { 
+            border: 1px solid #e2e8f0; 
+            border-radius: 10px; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            background: #ffffff;
+        }
+        .card-product:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 24px rgba(15,23,42,0.12); 
+        }
+        .price-tag { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: var(--lm-dark-blue); 
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e3a8a 100%);
+            border: 1px solid #1e293b;
+        }
+        .chat-widget-btn { 
+            position: fixed; 
+            bottom: 24px; 
+            right: 24px; 
+            width: 58px; 
+            height: 58px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, var(--lm-dark-blue), var(--lm-accent-blue)); 
+            color: white; 
+            border: 1px solid #3b82f6; 
+            box-shadow: 0 6px 18px rgba(15,23,42,0.35); 
+            cursor: pointer; 
+            z-index: 1000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.4rem; 
+        }
+        .chat-panel { 
+            position: fixed; 
+            bottom: 95px; 
+            right: 24px; 
+            width: 350px; 
+            height: 460px; 
+            background: #fff; 
+            border-radius: 12px; 
+            box-shadow: 0 12px 32px rgba(15,23,42,0.25); 
+            z-index: 1000; 
+            display: none; 
+            flex-direction: column; 
+            overflow: hidden; 
+            border: 1px solid #cbd5e1; 
+        }
+        .chat-header {
+            background: var(--lm-dark-blue);
+            color: #ffffff;
+            border-bottom: 2px solid var(--lm-accent-blue);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar (Hidden until login) -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top py-2" id="mainNavbar" style="display:none;">
+    <div class="container">
+        <a class="navbar-brand d-flex flex-column me-4" href="#" onclick="showSection('catalog')">
+            <span class="navbar-brand-title"><i class="fa-solid fa-store text-info me-2"></i>LingeshMart</span>
+            <span class="navbar-brand-sub">OFFICIAL MARKETPLACE</span>
+        </a>
+        <div class="d-flex mx-auto w-50">
+            <input class="form-control rounded-start border-0" type="search" id="searchInput" oninput="renderCatalog()" placeholder="Search products, brands and categories...">
+            <button class="btn btn-primary rounded-end" type="button" onclick="renderCatalog()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <!-- Logged-in User Profile Badge -->
+            <div id="userNavSection"></div>
+            <button class="btn btn-outline-light fw-bold ms-2" onclick="showSection('cart')">
+                <i class="fa-solid fa-bag-shopping me-1"></i> Cart (<span id="cartCount">0</span>)
+            </button>
+            <button class="btn btn-brand-primary fw-bold" onclick="showSection('seller')">
+                <i class="fa-solid fa-chart-line me-1"></i> Seller Hub
+            </button>
+            <button class="btn btn-dark border-secondary text-white fw-bold" onclick="showSection('admin')">
+                <i class="fa-solid fa-shield-halved me-1"></i> Admin
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Section 0: LOGIN PAGE (FIRST PAGE TO LOAD) -->
+    <div id="sectionLogin">
+        <div class="row justify-content-center py-4">
+            <div class="col-md-5">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #090d16 0%, #0f172a 60%, #1e3a8a 100%);">
+                        <div class="display-6 mb-2 text-info"><i class="fa-solid fa-store"></i></div>
+                        <h2 class="fw-bold mb-1">LingeshMart</h2>
+                        <p class="mb-0 text-white-50 small">Secure E-Commerce Marketplace Portal</p>
+                    </div>
+                    <div class="card-body p-4 bg-white">
+                        <form onsubmit="handleLoginSubmit(event)">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-secondary">Email Address</label>
+                                <input type="email" id="loginEmailInput" class="form-control form-control-lg fs-6" placeholder="buyer1@lingeshmart.com" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-secondary">Password</label>
+                                <input type="password" id="loginPasswordInput" class="form-control form-control-lg fs-6" value="password123" required>
+                            </div>
+                            <button type="submit" class="btn btn-brand-primary btn-lg w-100 py-3 font-weight-bold shadow-sm mb-3">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i> Enter Marketplace
+                            </button>
+                        </form>
+
+                        <hr class="my-3">
+
+                        <!-- Quick Demo Logins -->
+                        <div class="bg-light p-3 rounded-3 border">
+                            <strong class="d-block mb-2 text-dark small"><i class="fa-solid fa-key text-warning me-1"></i> Quick Role Logins:</strong>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary fw-bold text-start px-3 py-2 small" onclick="quickLogin('buyer1@lingeshmart.com', 'John Buyer', 'BUYER')">
+                                    <i class="fa-solid fa-user me-2"></i> Buyer Account (John Buyer)
+                                </button>
+                                <button class="btn btn-outline-dark fw-bold text-start px-3 py-2 small" onclick="quickLogin('seller1@lingeshmart.com', 'TechZone Electronics', 'SELLER')">
+                                    <i class="fa-solid fa-store me-2"></i> Seller Hub (TechZone)
+                                </button>
+                                <button class="btn btn-dark fw-bold text-start px-3 py-2 small" onclick="quickLogin('admin@lingeshmart.com', 'Lingesh Admin', 'ADMIN')">
+                                    <i class="fa-solid fa-shield-halved me-2"></i> Administrator (System Admin)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <button class="btn btn-link text-muted small text-decoration-none" onclick="quickLogin('guest@lingeshmart.com', 'Guest Buyer', 'BUYER')">Explore as Guest →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filter Bar (Hidden on Login) -->
+    <div id="categoryBar" class="card border-0 shadow-sm mb-4" style="display:none;">
+        <div class="card-body py-2">
+            <div class="d-flex flex-wrap gap-2 align-items-center justify-content-center">
+                <span class="fw-bold me-2 text-muted small"><i class="fa-solid fa-filter me-1"></i>Filter Category:</span>
+                <button class="btn btn-sm btn-dark rounded-pill px-3 cat-btn" onclick="filterCategory('ALL', this)">All</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 cat-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 cat-btn" onclick="filterCategory('Fashion', this)">Fashion</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 cat-btn" onclick="filterCategory('Home', this)">Home & Living</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 cat-btn" onclick="filterCategory('Books', this)">Books</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 1: Catalog -->
+    <div id="sectionCatalog" style="display:none;">
+        <div class="hero-banner text-white p-4 rounded-3 mb-4 shadow">
+            <h2 class="fw-bold mb-1">Welcome to LingeshMart Premier Collection</h2>
+            <p class="mb-0 text-white-50">Verified multi-seller marketplace with authentic items and expedited delivery.</p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0 text-dark">Available Listings</h4>
+            <span class="text-muted small" id="productCount">8 products found</span>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4" id="productGrid"></div>
+    </div>
+
+    <!-- Section 2: Cart -->
+    <div id="sectionCart" style="display:none;">
+        <h3 class="fw-bold mb-4"><i class="fa-solid fa-bag-shopping me-2 text-primary"></i>My Shopping Cart</h3>
+        <div class="row g-4">
+            <div class="col-md-8" id="cartList"></div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold border-bottom pb-2">Order Summary</h5>
+                    <div class="d-flex justify-content-between my-2"><span>Total Items</span><span id="summaryCount">0</span></div>
+                    <div class="d-flex justify-content-between my-2"><span>Delivery Charges</span><span class="text-success fw-bold">FREE</span></div>
+                    <hr>
+                    <div class="d-flex justify-content-between fs-5 fw-bold mb-4"><span>Grand Total</span><span class="text-primary" id="summaryTotal">₹0.00</span></div>
+                    <button class="btn btn-brand-primary btn-lg w-100 py-3" onclick="showSection('checkout')">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Checkout -->
+    <div id="sectionCheckout" style="display:none;">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm p-4">
+                    <h3 class="fw-bold text-dark mb-3"><i class="fa-solid fa-credit-card me-2 text-primary"></i>Order Checkout & Confirmation</h3>
+                    <p class="text-muted small">Mock Payment Confirmation Step (Specification Rule F5)</p>
+                    <div class="bg-light p-3 rounded mb-4 border">
+                        <div class="d-flex justify-content-between fs-5 fw-bold"><span>Total Amount Payable</span><span class="text-success" id="checkoutTotal">₹0.00</span></div>
+                    </div>
+                    <button class="btn btn-brand-primary btn-lg w-100 py-3 font-weight-bold" onclick="confirmPayment()">Confirm Order & Pay Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4: Seller Dashboard -->
+    <div id="sectionSeller" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Seller Hub & Sales Analytics</h3>
+            <button class="btn btn-brand-primary" onclick="showAddProductModal()"><i class="fa-solid fa-plus me-1"></i> Add Product Listing</button>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4"><div class="card bg-dark text-white p-3 rounded-3 border-secondary"><h6 class="small text-muted">Active Listings</h6><h3 id="sellerProductCount">5</h3></div></div>
+            <div class="col-md-4"><div class="card text-white p-3 rounded-3" style="background:#0f172a;"><h6 class="small text-muted">Total Sales Volume</h6><h3 class="text-info">₹2,45,000</h3></div></div>
+            <div class="col-md-4"><div class="card bg-primary text-white p-3 rounded-3"><h6 class="small text-white-50">Pending Fulfillment</h6><h3>3 Orders</h3></div></div>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold">Managed Inventory</div>
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th>Product Title</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr></thead>
+                    <tbody id="sellerTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 5: Admin Panel -->
+    <div id="sectionAdmin" style="display:none;">
+        <h3 class="fw-bold mb-4"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>System Administration Console</h3>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold">Platform User Registry & Compliance</div>
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th>Account Name</th><th>Email</th><th>Access Role</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Lingesh Admin</strong></td><td>admin@lingeshmart.com</td><td><span class="badge bg-dark">ADMIN</span></td><td><span class="badge bg-success">Active</span></td></tr>
+                        <tr><td><strong>TechZone Electronics</strong></td><td>seller1@lingeshmart.com</td><td><span class="badge bg-primary">SELLER</span></td><td><span class="badge bg-success">Active</span></td></tr>
+                        <tr><td><strong>StyleHub Fashion</strong></td><td>seller2@lingeshmart.com</td><td><span class="badge bg-primary">SELLER</span></td><td><span class="badge bg-success">Active</span></td></tr>
+                        <tr><td><strong>John Buyer</strong></td><td>buyer1@lingeshmart.com</td><td><span class="badge bg-secondary">BUYER</span></td><td><span class="badge bg-success">Active</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-black text-white py-4 mt-5 border-top border-dark">
+    <div class="container text-center text-muted small">
+        &copy; 2026 LingeshMart Multi-Seller Marketplace. Designed for Anna University R2025.
+    </div>
+</footer>
+
+<!-- AI Chatbot Drawer -->
+<button class="chat-widget-btn" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></button>
+<div class="chat-panel" id="chatPanel">
+    <div class="chat-header p-3 font-weight-bold d-flex justify-content-between align-items-center">
+        <span><i class="fa-solid fa-robot text-info me-2"></i>LingeshMart AI Assistant</span>
+        <span style="cursor:pointer" onclick="toggleChat()" class="text-white-50"><i class="fa-solid fa-xmark"></i></span>
+    </div>
+    <div class="p-3 flex-grow-1 overflow-auto" id="chatMessages" style="background:#f8fafc;">
+        <div class="bg-white p-2 rounded mb-2 small shadow-sm border">Hello! I am your LingeshMart assistant. Ask me anything about listings, orders, or delivery.</div>
+    </div>
+    <div class="p-2 border-top bg-white d-flex gap-2">
+        <input type="text" class="form-control form-control-sm" id="chatInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') sendChat()">
+        <button class="btn btn-brand-primary btn-sm px-3" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/bootstrap.bundle.min.js"></script>
+<script>
+    let products = [
+        { id: 1, name: 'iPhone 15 Pro Max (256 GB)', price: 134900, stockQty: 15, category: 'Electronics', imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600' },
+        { id: 2, name: 'MacBook Air M3 (16GB, 512GB)', price: 114900, stockQty: 10, category: 'Electronics', imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600' },
+        { id: 3, name: 'Sony WH-1000XM5 Headphones', price: 29990, stockQty: 25, category: 'Electronics', imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600' },
+        { id: 4, name: 'Men Leather Biker Jacket', price: 4999, stockQty: 40, category: 'Fashion', imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600' },
+        { id: 5, name: 'Nike Air Zoom Running Shoes', price: 6995, stockQty: 35, category: 'Fashion', imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600' },
+        { id: 6, name: 'Samsung 55-inch Crystal 4K TV', price: 42990, stockQty: 8, category: 'Home', imageUrl: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600' },
+        { id: 7, name: 'Ergonomic Mesh Office Chair', price: 7999, stockQty: 30, category: 'Home', imageUrl: 'https://images.unsplash.com/photo-1580481072645-022f9a6d1270?w=600' },
+        { id: 8, name: 'Clean Code by Robert C. Martin', price: 899, stockQty: 100, category: 'Books', imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600' }
+    ];
+
+    let cart = [];
+    let selectedCat = 'ALL';
+    let currentUser = null;
+
+    function handleLoginSubmit(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmailInput').value;
+        let role = 'BUYER';
+        let name = email.split('@')[0];
+        if (email.includes('seller')) { role = 'SELLER'; name = 'TechZone Electronics'; }
+        if (email.includes('admin')) { role = 'ADMIN'; name = 'Lingesh Admin'; }
+        quickLogin(email, name, role);
+    }
+
+    function quickLogin(email, name, role) {
+        currentUser = { email, name, role };
+        
+        // Show navbar & category bar after login
+        document.getElementById('mainNavbar').style.display = 'flex';
+        document.getElementById('categoryBar').style.display = 'block';
+
+        document.getElementById('userNavSection').innerHTML = `
+            <div class="dropdown d-inline-block">
+                <button class="btn btn-outline-light font-weight-bold dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-circle-user me-1 text-info"></i> ${name}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li><span class="dropdown-item-text text-muted small">Role: <strong>${role}</strong></span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                </ul>
+            </div>
+        `;
+        showAlert(`Welcome, ${name}! Logged in as ${role}.`, 'primary');
+
+        if (role === 'SELLER') showSection('seller');
+        else if (role === 'ADMIN') showSection('admin');
+        else showSection('catalog');
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('mainNavbar').style.display = 'none';
+        document.getElementById('categoryBar').style.display = 'none';
+        showAlert('Logged out successfully.', 'secondary');
+        showSection('login');
+    }
+
+    function filterCategory(cat, btn) {
+        selectedCat = cat;
+        document.querySelectorAll('.cat-btn').forEach(b => b.className = 'btn btn-sm btn-outline-secondary rounded-pill px-3 cat-btn');
+        btn.className = 'btn btn-sm btn-dark rounded-pill px-3 cat-btn';
+        renderCatalog();
+    }
+
+    function renderCatalog() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const grid = document.getElementById('productGrid');
+        const filtered = products.filter(p => {
+            let mQ = !query || p.name.toLowerCase().includes(query);
+            let mC = selectedCat === 'ALL' || p.category.toLowerCase() === selectedCat.toLowerCase();
+            return mQ && mC;
+        });
+
+        document.getElementById('productCount').innerText = `${filtered.length} products found`;
+
+        grid.innerHTML = filtered.map(p => `
+            <div class="col">
+                <div class="card h-100 card-product shadow-sm">
+                    <div class="text-center p-3 bg-white" style="height: 180px;">
+                        <img src="${p.imageUrl}" class="img-fluid h-100" style="object-fit: contain;">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <span class="badge bg-light text-dark border mb-1">${p.category}</span>
+                            <h6 class="fw-bold text-dark text-truncate mb-2">${p.name}</h6>
+                        </div>
+                        <div>
+                            <div class="price-tag mb-3">₹${p.price.toLocaleString('en-IN')}</div>
+                            <button class="btn btn-brand-dark btn-sm w-100 font-weight-bold" onclick="addToCart(${p.id})">
+                                <i class="fa-solid fa-bag-shopping me-1"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addToCart(id) {
+        const p = products.find(x => x.id === id);
+        if (p) {
+            cart.push(p);
+            document.getElementById('cartCount').innerText = cart.length;
+            showAlert(`Added '${p.name}' to cart!`, 'dark');
+        }
+    }
+
+    function showAlert(msg, type) {
+        const c = document.getElementById('alertContainer');
+        c.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show mb-3" role="alert"><i class="fa-solid fa-circle-check me-2"></i>${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+    }
+
+    function showSection(sec) {
+        ['Login', 'Catalog', 'Cart', 'Checkout', 'Seller', 'Admin'].forEach(s => {
+            document.getElementById('section' + s).style.display = (s.toLowerCase() === sec) ? 'block' : 'none';
+        });
+        if (sec === 'cart') renderCart();
+        if (sec === 'seller') renderSeller();
+    }
+
+    function renderCart() {
+        const list = document.getElementById('cartList');
+        let total = cart.reduce((a, b) => a + b.price, 0);
+        document.getElementById('summaryCount').innerText = cart.length;
+        document.getElementById('summaryTotal').innerText = `₹${total.toLocaleString('en-IN')}`;
+        document.getElementById('checkoutTotal').innerText = `₹${total.toLocaleString('en-IN')}`;
+
+        if (cart.length === 0) {
+            list.innerHTML = '<div class="alert alert-light border py-4 text-center">Your shopping cart is empty!</div>';
+            return;
+        }
+
+        list.innerHTML = cart.map((item, idx) => `
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-white rounded mb-2 shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="${item.imageUrl}" style="width:60px;height:60px;object-fit:contain;">
+                    <div>
+                        <h6 class="mb-0 fw-bold text-dark">${item.name}</h6>
+                        <span class="text-muted small">${item.category}</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="fw-bold fs-5 text-dark">₹${item.price.toLocaleString('en-IN')}</div>
+                    <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart(${idx})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function removeFromCart(idx) {
+        cart.splice(idx, 1);
+        document.getElementById('cartCount').innerText = cart.length;
+        renderCart();
+    }
+
+    function confirmPayment() {
+        showAlert('Payment Confirmed! Your order #LM-102 has been successfully placed.', 'success');
+        cart = [];
+        document.getElementById('cartCount').innerText = 0;
+        showSection('catalog');
+    }
+
+    function renderSeller() {
+        document.getElementById('sellerProductCount').innerText = products.length;
+        const table = document.getElementById('sellerTable');
+        table.innerHTML = products.map(p => `
+            <tr>
+                <td><strong>${p.name}</strong></td>
+                <td><span class="badge bg-secondary">${p.category}</span></td>
+                <td class="fw-bold">₹${p.price.toLocaleString('en-IN')}</td>
+                <td><span class="badge bg-success">${p.stockQty} in stock</span></td>
+                <td><button class="btn btn-outline-danger btn-sm" onclick="deleteProduct(${p.id})">Delete</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function deleteProduct(id) {
+        products = products.filter(p => p.id !== id);
+        renderSeller();
+        renderCatalog();
+    }
+
+    function showAddProductModal() {
+        const title = prompt("Enter product title:");
+        if (!title) return;
+        const price = parseFloat(prompt("Enter price (INR):", "1999"));
+        const category = prompt("Enter category (Electronics/Fashion/Home/Books):", "Electronics");
+        products.push({ id: products.length + 1, name: title, price: price || 999, stockQty: 20, category: category || "Electronics", imageUrl: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600" });
+        renderSeller();
+        renderCatalog();
+        showAlert(`Product listing '${title}' added successfully!`, 'success');
+    }
+
+    function toggleChat() {
+        const p = document.getElementById('chatPanel');
+        p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function sendChat() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+        const box = document.getElementById('chatMessages');
+        box.innerHTML += `<div class="bg-dark text-white p-2 rounded mb-2 small text-end">${text}</div>`;
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        let reply = "LingeshMart shipping delivers within 2-3 business days. All items come with buyer guarantee.";
+        if (text.toLowerCase().includes('shoe') || text.toLowerCase().includes('nike')) reply = "We have Nike Air Zoom Running Shoes in stock for ₹6,995!";
+        if (text.toLowerCase().includes('seller')) reply = "To sell products, click the Seller Hub button in the top navigation bar.";
+
+        setTimeout(() => {
+            box.innerHTML += `<div class="bg-white border p-2 rounded mb-2 small shadow-sm">${reply}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }, 300);
+    }
+
+    // Initialize: SHOW LOGIN PAGE FIRST
+    showSection('login');
+    renderCatalog();
+</script>
+</body>
+</html>

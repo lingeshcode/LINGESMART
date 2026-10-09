@@ -1,0 +1,22 @@
+target/
+*.war
+*.ear
+*.jar
+*.class
+
+# IDE files
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Environment files
+.env
+config.properties
+
+# Logs & Database files
+*.log
+*.mv.db
+*.trace.db
